@@ -32,9 +32,22 @@
                             $textColor = 'text-gray-400';
 
                             if ($roomData) {
-                                $isFull = $roomData->residents_count >= $roomData->capacity;
-                                $bgColor = $isFull ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200';
-                                $borderColor = $isFull ? 'border-red-500' : 'border-green-500';
+                                // Cek pakai logic Model atau manual
+                                // is_exclusive bernilai 1 (true) atau 0 (false)
+                                $isExclusive = $roomData->is_exclusive;
+                                $isFullCapacity = $roomData->residents_count >= $roomData->capacity;
+
+                                // Logic Warna: Merah jika Penuh ATAU Exclusive
+                                if ($isExclusive || $isFullCapacity) {
+                                    $bgColor = 'bg-red-50 border-red-200';
+                                    $borderColor = 'border-red-500';
+                                    $statusText = $isExclusive ? 'BOOKED FULL' : 'PENUH'; // Opsional: teks status
+                                } else {
+                                    $bgColor = 'bg-green-50 border-green-200';
+                                    $borderColor = 'border-green-500';
+                                    $statusText = 'TERSEDIA';
+                                }
+
                                 $textColor = 'text-gray-800';
                             }
                         @endphp
@@ -46,8 +59,12 @@
                                 <div class="font-bold text-lg {{ $textColor }}">{{ $roomData->number }}</div>
 
                                 {{-- Info Penghuni --}}
-                                <div class="text-xs font-semibold mt-1 px-2 py-1 rounded-full {{ $roomData->residents_count >= $roomData->capacity ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700' }}">
-                                    {{ $roomData->residents_count }} / {{ $roomData->capacity }} Orang
+                                <div class="text-xs font-semibold mt-1 px-2 py-1 rounded-full {{ ($roomData->is_exclusive || $roomData->residents_count >= $roomData->capacity) ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700' }}">
+                                    @if($roomData->is_exclusive)
+                                        <span class="font-bold">EXCLUSIVE ({{ $roomData->residents_count }}/{{ $roomData->capacity }})</span>
+                                    @else
+                                        {{ $roomData->residents_count }} / {{ $roomData->capacity }} Orang
+                                    @endif
                                 </div>
 
                                 {{-- Link Edit Cepat --}}
@@ -88,7 +105,7 @@
                                 <th class="p-3 text-sm font-semibold text-gray-600">Lokasi</th>
                                 <th class="p-3 text-sm font-semibold text-gray-600">No. Kamar</th>
                                 <th class="p-3 text-sm font-semibold text-gray-600">Hunian</th>
-                                <th class="p-3 text-sm font-semibold text-gray-600">Harga</th>
+                                <th class="p-3 text-sm font-semibold text-gray-600">Harga (Rp)/per orang</th>
                                 <th class="p-3 text-sm font-semibold text-gray-600 text-center">Aksi</th>
                             </tr>
                         </thead>
@@ -112,7 +129,7 @@
                                         <span class="text-xs text-gray-600">{{ $room->residents_count }}/{{ $room->capacity }}</span>
                                     </div>
                                 </td>
-                                <td class="p-3 font-mono text-sm">Rp {{ number_format($room->price, 0, ',', '.') }}</td>
+                                <td class="p-3 font-mono text-sm">Rp {{ number_format($room->price, 0, ',', '.') }}/orang</td>
                                 <td class="p-3 text-center space-x-2">
                                     <a href="{{ route('rooms.edit', $room) }}" class="text-yellow-600 hover:text-yellow-800 text-sm font-semibold">Edit</a>
                                     <form action="{{ route('rooms.destroy', $room) }}" method="POST" class="inline" onsubmit="return confirm('Yakin hapus kamar ini?');">

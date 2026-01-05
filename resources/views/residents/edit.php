@@ -35,18 +35,31 @@
                             <select name="room_id" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full mt-1">
                                 @foreach($rooms as $room)
                                     @php
-                                        $filled = $room->residents()->count();
+                                        $filled = $room->residents_count;
                                         $sisa = $room->capacity - $filled;
-                                        // Kamar penuh boleh dipilih JIKA itu adalah kamar dia sendiri saat ini
-                                        $isFull = $sisa <= 0 && $room->id != $resident->room_id;
+                                        $isMyRoom = $resident->room_id == $room->id;
+
+                                        // Kamar disable jika Penuh/Exclusive KECUALI kamar sendiri
+                                        $isFull = ($sisa <= 0 || $room->is_exclusive) && !$isMyRoom;
+
+                                        // Label Text Logic
+                                        if ($isMyRoom) {
+                                            $statusText = 'Saat ini';
+                                        } elseif ($room->is_exclusive) {
+                                            $statusText = 'EXCLUSIVE (FULL)';
+                                        } elseif ($sisa <= 0) {
+                                            $statusText = 'PENUH';
+                                        } else {
+                                            $statusText = 'Sisa ' . $sisa . ' slot';
+                                        }
                                     @endphp
 
                                     <option value="{{ $room->id }}"
-                                        {{ $resident->room_id == $room->id ? 'selected' : '' }}
+                                        {{ $isMyRoom ? 'selected' : '' }}
                                         {{ $isFull ? 'disabled' : '' }}
                                         class="{{ $isFull ? 'text-gray-400 bg-gray-100' : '' }}">
                                         Kamar {{ $room->number }}
-                                        ({{ $resident->room_id == $room->id ? 'Saat ini' : ($isFull ? 'PENUH' : 'Sisa '.$sisa.' slot') }})
+                                        ({{ $statusText }})
                                     </option>
                                 @endforeach
                             </select>

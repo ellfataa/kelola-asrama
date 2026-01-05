@@ -37,14 +37,26 @@
                                 <option value="">-- Pilih Kamar --</option>
                                 @foreach($rooms as $room)
                                     @php
-                                        $filled = $room->residents()->count();
+                                        // Gunakan residents_count dari controller (lebih cepat)
+                                        $filled = $room->residents_count;
                                         $sisa = $room->capacity - $filled;
-                                        $isFull = $sisa <= 0;
+
+                                        // Logic Status: Penuh jika sisa 0 ATAU Exclusive
+                                        $isFull = $sisa <= 0 || $room->is_exclusive;
+
+                                        // Label Text
+                                        if ($room->is_exclusive) {
+                                            $statusText = 'EXCLUSIVE (FULL)';
+                                        } elseif ($sisa <= 0) {
+                                            $statusText = 'PENUH';
+                                        } else {
+                                            $statusText = 'Sisa ' . $sisa . ' slot';
+                                        }
                                     @endphp
 
                                     <option value="{{ $room->id }}" {{ $isFull ? 'disabled' : '' }} class="{{ $isFull ? 'text-gray-400 bg-gray-100' : '' }}">
                                         Kamar {{ $room->number }}
-                                        ({{ $isFull ? 'PENUH' : 'Sisa ' . $sisa . ' slot' }})
+                                        ({{ $statusText }})
                                         - Rp {{ number_format($room->price, 0, ',', '.') }}
                                     </option>
                                 @endforeach

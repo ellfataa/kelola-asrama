@@ -19,6 +19,13 @@ class Room extends Model
     // Akan mengembalikan true jika jumlah penghuni >= kapasitas
     public function isFull()
     {
+        // Kamar penuh jika:
+        // 1. Jumlah penghuni >= Kapasitas
+        // 2. ATAU Statusnya Exclusive (Booking 1 kamar)
+        if ($this->is_exclusive) {
+            return true;
+        }
+
         return $this->residents()->count() >= $this->capacity;
     }
 }

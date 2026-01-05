@@ -5,118 +5,128 @@
         </h2>
     </x-slot>
 
-    {{-- LOGIC PHP: Menghitung Data Real-time --}}
+    {{-- LOGIC PHP: Perhitungan Data Real-time & Cerdas --}}
     @php
-        // 1. Hitung Total Kamar
-        $totalRooms = \App\Models\Room::count();
+        // 1. Ambil Semua Data Kamar dengan jumlah penghuni
+        $rooms = \App\Models\Room::withCount('residents')->get();
 
-        // 2. Hitung Total Penghuni Aktif
+        // 2. Variabel Statistik Dasar
+        $totalRooms = $rooms->count();
         $totalResidents = \App\Models\Resident::count();
 
-        // 3. Hitung Total Kapasitas Asrama (Sum dari kolom capacity semua kamar)
-        $totalCapacity = \App\Models\Room::sum('capacity');
+        // 3. Logic Hitung Kapasitas & Okupansi (Support Exclusive)
+        $totalCapacity = 0;
+        $occupiedSlots = 0; // Slot yang "dianggap" terisi
 
-        // 4. Hitung Sisa Slot
-        $availableSlots = $totalCapacity - $totalResidents;
+        foreach($rooms as $room) {
+            $totalCapacity += $room->capacity;
 
-        // 5. Hitung Persentase Hunian (Okupansi)
-        $occupancyRate = $totalCapacity > 0 ? round(($totalResidents / $totalCapacity) * 100) : 0;
+            if ($room->is_exclusive) {
+                // Jika Exclusive, seluruh kapasitas dianggap TERPAKAI
+                $occupiedSlots += $room->capacity;
+            } else {
+                // Jika Reguler, terpakai sesuai jumlah orang
+                $occupiedSlots += $room->residents_count;
+            }
+        }
 
-        // 6. Hitung Estimasi Pendapatan (Hanya dari penghuni yang ada)
-        // Logic: Mengambil semua penghuni, lalu menjumlahkan harga kamar mereka
+        // Hitung sisa slot tersedia
+        $availableSlots = $totalCapacity - $occupiedSlots;
+        if($availableSlots < 0) $availableSlots = 0;
+
+        // Persentase Okupansi
+        $occupancyRate = $totalCapacity > 0 ? round(($occupiedSlots / $totalCapacity) * 100) : 0;
+
+        // 4. Hitung Estimasi Pendapatan (Real)
         $currentIncome = \App\Models\Resident::with('room')->get()->sum(function($resident) {
             return $resident->room->price;
         });
     @endphp
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
-            {{-- GRID STATISTIK --}}
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-
-                {{-- CARD 1: TOTAL KAMAR --}}
+            {{-- ROW 1: STATISTIK UTAMA --}}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {{-- Card Total Kamar --}}
                 <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-blue-500 flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Total Kamar</p>
                         <p class="text-3xl font-bold text-gray-900 mt-1">{{ $totalRooms }}</p>
-                        <p class="text-xs text-blue-600 mt-1 font-semibold">Unit Siap Huni</p>
+                        <p class="text-xs text-blue-600 mt-1 font-semibold">Unit Asset</p>
                     </div>
                     <div class="p-3 bg-blue-100 rounded-full text-blue-600">
-                        {{-- Icon Rumah/Bed --}}
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                     </div>
                 </div>
 
-                {{-- CARD 2: PENGHUNI (REAL DATA) --}}
+                {{-- Card Penghuni --}}
                 <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-green-500 flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Total Penghuni</p>
                         <p class="text-3xl font-bold text-gray-900 mt-1">{{ $totalResidents }}</p>
-                        <p class="text-xs text-green-600 mt-1 font-semibold">Orang Terdaftar</p>
+                        <p class="text-xs text-green-600 mt-1 font-semibold">Orang Aktif</p>
                     </div>
                     <div class="p-3 bg-green-100 rounded-full text-green-600">
-                        {{-- Icon Users --}}
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                     </div>
                 </div>
 
-                {{-- CARD 3: PENDAPATAN RIIL & SISA SLOT --}}
+                {{-- Card Pendapatan & Sisa Slot --}}
                 <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-purple-500 flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Potensi Pendapatan</p>
+                        <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Estimasi Income</p>
                         <p class="text-2xl font-bold text-gray-900 mt-1">Rp {{ number_format($currentIncome, 0, ',', '.') }}</p>
-                        <p class="text-xs text-purple-600 mt-1 font-semibold">Bulan Ini (Aktif)</p>
+                        <p class="text-xs text-purple-600 mt-1 font-semibold">Bulan Ini</p>
                     </div>
                     <div class="text-right">
                         <p class="text-xs text-gray-400 uppercase">Sisa Slot</p>
-                        <p class="text-2xl font-bold text-gray-700">{{ $availableSlots }}</p>
+                        <p class="text-2xl font-bold {{ $availableSlots == 0 ? 'text-red-600' : 'text-gray-700' }}">{{ $availableSlots }}</p>
                     </div>
                 </div>
-
             </div>
 
-            {{-- SECTION STATISTIK OKUPANSI --}}
+            {{-- ROW 2: PROGRESS OKUPANSI & SHORTCUT --}}
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-                {{-- Kiri: Bar Chart Sederhana (Okupansi) --}}
-                <div class="md:col-span-2 bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">Tingkat Hunian Asrama</h3>
+                {{-- KIRI: STATISTIK OKUPANSI --}}
+                <div class="md:col-span-2 bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 flex flex-col justify-center">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">Statistik Okupansi Asrama</h3>
 
-                        <div class="mb-2 flex justify-between text-sm text-gray-600">
-                            <span>Terisi: {{ $totalResidents }} orang</span>
-                            <span>Kapasitas Total: {{ $totalCapacity }} orang</span>
+                    <div class="flex items-center justify-between text-sm text-gray-600 mb-2">
+                        <span>Terpakai: <b>{{ $occupiedSlots }}</b> slot ({{ $occupancyRate }}%)</span>
+                        <span>Total Kapasitas: <b>{{ $totalCapacity }}</b> slot</span>
+                    </div>
+
+                    {{-- Progress Bar --}}
+                    <div class="w-full bg-gray-200 rounded-full h-6 overflow-hidden shadow-inner">
+                        <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white transition-all duration-1000 ease-out"
+                             style="width: {{ $occupancyRate }}%">
+                             {{ $occupancyRate }}%
                         </div>
+                    </div>
 
-                        {{-- Progress Bar Container --}}
-                        <div class="w-full bg-gray-200 rounded-full h-6 dark:bg-gray-700 overflow-hidden">
-                            {{-- Progress Bar Fill --}}
-                            <div class="bg-blue-600 h-6 rounded-full text-xs font-medium text-blue-100 text-center p-0.5 leading-none transition-all duration-500"
-                                 style="width: {{ $occupancyRate }}%">
-                                {{ $occupancyRate }}%
-                            </div>
-                        </div>
-
-                        <p class="text-sm text-gray-500 mt-4">
-                            Saat ini asrama terisi <b>{{ $occupancyRate }}%</b> dari total kapasitas.
-                            Masih tersedia <b>{{ $availableSlots }}</b> tempat tidur kosong.
+                    <div class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-100 text-sm text-gray-600">
+                        <p>
+                            <span class="font-bold text-gray-800">Info:</span>
+                            Perhitungan slot terpakai di atas sudah otomatis memperhitungkan kamar dengan status
+                            <span class="font-bold text-purple-600">Exclusive Booking</span> (dihitung penuh).
                         </p>
                     </div>
                 </div>
 
-                {{-- Kanan: Quick Actions / Welcome --}}
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <h3 class="text-lg font-bold text-gray-800 mb-2">Aksi Cepat</h3>
-                        <div class="flex flex-col space-y-3 mt-4">
-                            <a href="{{ route('residents.create') }}" class="block w-full text-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 active:bg-blue-900 focus:outline-none focus:border-blue-900 focus:ring ring-blue-300 disabled:opacity-25 transition ease-in-out duration-150">
-                                + Tambah Penghuni
-                            </a>
-                            <a href="{{ route('rooms.create') }}" class="block w-full text-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
-                                + Tambah Kamar
-                            </a>
-                        </div>
+                {{-- KANAN: AKSI CEPAT --}}
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">Aksi Cepat</h3>
+                    <div class="space-y-4">
+                        <a href="{{ route('residents.create') }}" class="flex items-center justify-center w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold text-sm shadow-md hover:shadow-lg">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                            Daftar Penghuni Baru
+                        </a>
+                        <a href="{{ route('rooms.create') }}" class="flex items-center justify-center w-full px-4 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-semibold text-sm shadow-sm hover:shadow">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                            Tambah Unit Kamar
+                        </a>
                     </div>
                 </div>
             </div>

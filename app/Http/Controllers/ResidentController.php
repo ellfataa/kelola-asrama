@@ -17,9 +17,9 @@ class ResidentController extends Controller
 
     public function create()
     {
-        // Kita butuh data kamar untuk ditampilkan di Dropdown (Select Option)
-        // Opsional: Bisa difilter hanya kamar yang belum penuh, tapi untuk sekarang semua saja.
-        $rooms = Room::all();
+        // OPTIMASI: Gunakan withCount untuk menghitung jumlah penghuni langsung dari database
+        // Ini mencegah query berulang (N+1 Problem) di dalam loop view
+        $rooms = Room::withCount('residents')->get();
         return view('residents.create', compact('rooms'));
     }
 
@@ -33,14 +33,14 @@ class ResidentController extends Controller
             'entry_date' => 'required|date',
         ]);
 
-        // LOGIC VALIDASI KAPASITAS
+        // LOGIC VALIDASI KAPASITAS (UPDATE DISINI)
         $room = Room::findOrFail($request->room_id);
-        $currentResidents = $room->residents()->count();
 
-        if ($currentResidents >= $room->capacity) {
+        // Gunakan method model isFull() yang sudah kita update
+        if ($room->isFull()) {
             return back()
-                ->withInput() // Kembalikan inputan user
-                ->withErrors(['room_id' => 'Kamar ' . $room->number . ' sudah penuh! (Kapasitas: ' . $room->capacity . ')']);
+                ->withInput()
+                ->withErrors(['room_id' => 'Kamar ' . $room->number . ' sudah penuh atau dibooking eksklusif!']);
         }
 
         Resident::create($request->all());
@@ -50,7 +50,7 @@ class ResidentController extends Controller
 
     public function edit(Resident $resident)
     {
-        $rooms = Room::all();
+        $rooms = Room::withCount('residents')->get();
         return view('residents.edit', compact('resident', 'rooms'));
     }
 
@@ -64,13 +64,15 @@ class ResidentController extends Controller
             'entry_date' => 'required|date',
         ]);
 
-        // LOGIC VALIDASI KAPASITAS SAAT PINDAH KAMAR
+        // LOGIC VALIDASI KAPASITAS SAAT PINDAH KAMAR (UPDATE DISINI)
         if ($request->room_id != $resident->room_id) {
             $newRoom = Room::findOrFail($request->room_id);
-            if ($newRoom->residents()->count() >= $newRoom->capacity) {
+
+            // Gunakan method model isFull()
+            if ($newRoom->isFull()) {
                 return back()
                     ->withInput()
-                    ->withErrors(['room_id' => 'Kamar tujuan penuh!']);
+                    ->withErrors(['room_id' => 'Kamar tujuan penuh atau dibooking eksklusif!']);
             }
         }
 

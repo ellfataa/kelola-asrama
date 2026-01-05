@@ -18,7 +18,7 @@ class RoomController extends Controller
         $mappedRooms = Room::withCount('residents')->get()->keyBy('location_code');
 
         // 3. Ambil data paginasi untuk Tabel di bawah
-        $rooms = Room::latest()->paginate(10);
+        $rooms = Room::withCount('residents')->latest()->paginate(10);
 
         return view('rooms.index', compact('rooms', 'roomMap', 'mappedRooms'));
     }
@@ -52,7 +52,6 @@ class RoomController extends Controller
     // Simpan data kamar baru
     public function store(Request $request)
     {
-        // Kita bersihkan format harga jika ada (logic sebelumnya)
         $request->merge([
             'price' => str_replace('.', '', $request->price),
         ]);
@@ -63,9 +62,14 @@ class RoomController extends Controller
             'capacity' => 'required|integer|min:1',
             'price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
+            'is_exclusive' => 'boolean',
         ]);
 
-        Room::create($request->all());
+        // Default false jika tidak dicentang
+        $data = $request->all();
+        $data['is_exclusive'] = $request->has('is_exclusive');
+
+        Room::create($data);
 
         return redirect()->route('rooms.index')->with('success', 'Kamar berhasil ditambahkan.');
     }
@@ -82,21 +86,23 @@ class RoomController extends Controller
     // Update data kamar
     public function update(Request $request, Room $room)
     {
-        // Bersihkan format harga
         $request->merge([
             'price' => str_replace('.', '', $request->price),
         ]);
 
         $request->validate([
-            // Validasi unique location_code harus mengecualikan ID kamar ini sendiri
-            'location_code' => 'required|integer|between:1,10|unique:rooms,location_code,' . $room->id,
+            'location_code' => 'required|integer|between:1,20|unique:rooms,location_code,' . $room->id,
             'number' => 'required|max:10|unique:rooms,number,' . $room->id,
             'capacity' => 'required|integer|min:1',
             'price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
+            'is_exclusive' => 'boolean', // VALIDASI BARU
         ]);
 
-        $room->update($request->all());
+        $data = $request->all();
+        $data['is_exclusive'] = $request->has('is_exclusive'); // Handle checkbox
+
+        $room->update($data);
 
         return redirect()->route('rooms.index')->with('success', 'Data kamar diperbarui.');
     }

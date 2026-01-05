@@ -101,7 +101,7 @@
                                         <input type="number" name="capacity" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full mt-1" required min="1">
                                     </div>
                                     <div>
-                                        <label class="block font-medium text-sm text-gray-700">Harga (Rp)</label>
+                                        <label class="block font-medium text-sm text-gray-700">Harga (Rp)/per orang</label>
                                         <input type="number" name="price" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full mt-1" required min="0">
                                     </div>
                                 </div>
@@ -112,6 +112,16 @@
                                 </div>
 
                                 <div class="flex justify-end mt-8">
+                                    <div class="block mt-4">
+                                        <label for="is_exclusive" class="inline-flex items-center">
+                                            <input id="is_exclusive" type="checkbox" name="is_exclusive" value="1"
+                                                {{ old('is_exclusive', isset($room) ? $room->is_exclusive : false) ? 'checked' : '' }}
+                                                class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
+                                            <span class="ms-2 text-sm text-gray-600 font-bold">Booking Satu Kamar (Exclusive)</span>
+                                        </label>
+                                        <p class="text-xs text-gray-500 mt-1 ml-6">Jika dicentang, kamar dianggap PENUH berapapun jumlah penghuninya.</p>
+                                    </div>
+
                                     <a href="{{ route('rooms.index') }}" class="mr-4 py-2 px-4 bg-gray-200 rounded text-gray-700">Batal</a>
 
                                     {{-- Tombol mati jika belum pilih lokasi --}}
