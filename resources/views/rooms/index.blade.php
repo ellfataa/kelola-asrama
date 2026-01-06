@@ -106,6 +106,7 @@
                                 <th class="p-3 text-sm font-semibold text-gray-600">No. Kamar</th>
                                 <th class="p-3 text-sm font-semibold text-gray-600">Hunian</th>
                                 <th class="p-3 text-sm font-semibold text-gray-600">Harga (Rp)/per orang</th>
+                                <th class="p-3 text-sm font-semibold text-gray-600">Total Harga (Rp)</th>
                                 <th class="p-3 text-sm font-semibold text-gray-600 text-center">Aksi</th>
                             </tr>
                         </thead>
@@ -126,10 +127,12 @@
                                         <div class="w-24 bg-gray-200 rounded-full h-2.5">
                                             <div class="bg-blue-600 h-2.5 rounded-full" style="width: {{ ($room->residents_count / $room->capacity) * 100 }}%"></div>
                                         </div>
-                                        <span class="text-xs text-gray-600">{{ $room->residents_count }}/{{ $room->capacity }}</span>
+                                        <span class="text-xs text-gray-600">{{ $room->residents_count }}/{{ $room->capacity }} {{ ($room->is_exclusive || $room->residents_count >= $room->capacity) ? '(Penuh)' : '' }}</span>
                                     </div>
                                 </td>
                                 <td class="p-3 font-mono text-sm">Rp {{ number_format($room->price, 0, ',', '.') }}/orang</td>
+                                <td class="p-3 font-mono text-sm">Rp {{ $room->is_exclusive ? number_format($room->price, 0, ',', '.') : number_format($room->price * $room->residents_count, 0, ',', '.') }}</td>
+
                                 <td class="p-3 text-center space-x-2">
                                     <a href="{{ route('rooms.edit', $room) }}" class="text-yellow-600 hover:text-yellow-800 text-sm font-semibold">Edit</a>
                                     <form action="{{ route('rooms.destroy', $room) }}" method="POST" class="inline" onsubmit="return confirm('Yakin hapus kamar ini?');">
@@ -140,7 +143,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="5" class="p-6 text-center text-gray-500 italic">Belum ada data kamar yang diinput.</td>
+                                <td colspan="6" class="p-6 text-center text-gray-500 italic">Belum ada data kamar yang diinput.</td>
                             </tr>
                             @endforelse
                         </tbody>
