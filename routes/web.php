@@ -20,7 +20,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // === ROUTE PENGELOLAAN ASRAMA ===
-
     // 1. Route untuk Data Kamar (URL: /rooms)
     Route::resource('rooms', RoomController::class);
 
