@@ -1,140 +1,128 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>{{ config('app.name', 'Sistem Asrama') }}</title>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ config('app.name', 'Sistem Asrama') }}</title>
 
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet">
 
-        @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-            @vite(['resources/css/app.css', 'resources/js/app.js'])
-        @else
-            <script src="https://cdn.tailwindcss.com"></script>
-            <style>
-                @keyframes float {
-                    0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-                    10% { opacity: 0.3; }
-                    90% { opacity: 0.3; }
-                    100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @else
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            sans: ['Inter', 'sans-serif'],
+                        },
+                        animation: {
+                            'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                            'blob': 'blob 7s infinite',
+                        },
+                        keyframes: {
+                            fadeInUp: {
+                                '0%': { opacity: '0', transform: 'translateY(20px)' },
+                                '100%': { opacity: '1', transform: 'translateY(0)' },
+                            },
+                            blob: {
+                                '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                                '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                                '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                                '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                            }
+                        }
+                    }
                 }
+            }
+        </script>
+        <style>
+            /* Custom Grid Background */
+            .bg-grid-pattern {
+                background-image: linear-gradient(to right, #e2e8f0 1px, transparent 1px),
+                                  linear-gradient(to bottom, #e2e8f0 1px, transparent 1px);
+                background-size: 40px 40px;
+                mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+                -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+            }
+        </style>
+    @endif
+</head>
+<body class="h-full bg-white text-slate-900 antialiased selection:bg-indigo-500 selection:text-white">
 
-                @keyframes fadeInUp {
-                    from { opacity: 0; transform: translateY(30px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="absolute inset-0 bg-grid-pattern opacity-[0.4]"></div>
+        <div class="absolute top-0 -left-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+        <div class="absolute top-0 -right-4 w-72 h-72 bg-indigo-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+        <div class="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+    </div>
 
-                @keyframes scaleIn {
-                    from { opacity: 0; transform: scale(0.9); }
-                    to { opacity: 1; transform: scale(1); }
-                }
-
-                @keyframes pulse {
-                    0%, 100% { transform: scale(1); }
-                    50% { transform: scale(1.05); }
-                }
-
-                .particle {
-                    position: absolute;
-                    background: rgba(255, 255, 255, 0.1);
-                    border-radius: 50%;
-                    animation: float linear infinite;
-                }
-
-                .particle:nth-child(1) { width: 80px; height: 80px; left: 10%; animation-duration: 20s; }
-                .particle:nth-child(2) { width: 60px; height: 60px; left: 25%; animation-duration: 25s; animation-delay: 2s; }
-                .particle:nth-child(3) { width: 100px; height: 100px; left: 50%; animation-duration: 30s; animation-delay: 4s; }
-                .particle:nth-child(4) { width: 70px; height: 70px; left: 70%; animation-duration: 22s; animation-delay: 1s; }
-                .particle:nth-child(5) { width: 90px; height: 90px; left: 85%; animation-duration: 28s; animation-delay: 3s; }
-
-                .animate-fade-in-up { animation: fadeInUp 0.8s ease-out both; }
-                .animate-scale-in { animation: scaleIn 0.6s ease-out; }
-                .animate-pulse-slow { animation: pulse 3s ease-in-out infinite; }
-
-                .delay-200 { animation-delay: 0.2s; }
-                .delay-400 { animation-delay: 0.4s; }
-                .delay-600 { animation-delay: 0.6s; }
-
-                .btn-shimmer::before {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    left: -100%;
-                    width: 100%;
-                    height: 100%;
-                    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-                    transition: left 0.5s;
-                }
-
-                .btn-shimmer:hover::before {
-                    left: 100%;
-                }
-            </style>
-        @endif
-    </head>
-    <body class="bg-gradient-to-br from-purple-500 via-purple-600 to-purple-800 min-h-screen overflow-x-hidden">
-
-        <!-- Animated Background Particles -->
-        <div class="fixed inset-0 pointer-events-none">
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
+    <nav class="relative z-50 w-full px-6 py-6 flex justify-between items-center max-w-7xl mx-auto">
+        <div class="flex items-center gap-2 font-bold text-xl tracking-tight text-slate-800">
+            <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                    <path d="M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a.75.75 0 101.06-1.06l-8.689-8.69a2.25 2.25 0 00-3.182 0l-8.69 8.69a.75.75 0 001.061 1.06l8.69-8.69z"/>
+                    <path d="M12 5.432l8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 01-.75-.75v-4.5a.75.75 0 00-.75-.75h-3a.75.75 0 00-.75.75V21a.75.75 0 01-.75.75H5.625a1.875 1.875 0 01-1.875-1.875v-6.198a2.29 2.29 0 00.091-.086L12 5.43z"/>
+                </svg>
+            </div>
+            <span>Asrama<span class="text-indigo-600">App</span></span>
         </div>
+    </nav>
 
-        <!-- Main Content -->
-        <main class="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-8">
-            <div class="max-w-5xl w-full text-center">
+    <main class="relative z-10 flex flex-col justify-center items-center min-h-[80vh] px-4 sm:px-6 lg:px-8">
+        <div class="w-full max-w-3xl text-center space-y-8 animate-fade-in-up">
 
-                <!-- Logo -->
-                <div class="mb-10 animate-scale-in">
-                    <svg class="w-24 h-24 md:w-32 md:h-32 mx-auto drop-shadow-2xl animate-pulse-slow"
-                         viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z"
-                              stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M9 22V12H15V22"
-                              stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-semibold uppercase tracking-wide mb-4">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                </span>
+                Sistem Informasi Manajemen
+            </div>
 
-                <!-- Title -->
-                <h1 class="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white mb-5 animate-fade-in-up delay-200 leading-tight drop-shadow-lg">
-                    Sistem Pengelolaan Asrama
-                </h1>
+            <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                Kelola Asrama dengan
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">Lebih Cerdas</span>
+            </h1>
 
-                <!-- Subtitle -->
-                <p class="text-lg md:text-xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed animate-fade-in-up delay-400">
-                    Platform modern untuk manajemen dan monitoring asrama secara efisien dan terorganisir
-                </p>
+            <p class="text-lg md:text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed">
+                Platform terintegrasi untuk pendaftaran, monitoring penghuni, dan manajemen fasilitas asrama dalam satu dashboard yang modern.
+            </p>
 
-                <!-- CTA Buttons -->
-                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up delay-600">
-                    @guest
-                        <a href="{{ route('login') }}"
-                           class="relative overflow-hidden btn-shimmer inline-flex items-center justify-center px-10 py-4 bg-white text-slate-800 font-bold text-lg rounded-2xl shadow-2xl hover:shadow-3xl hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto">
-                            Masuk
-                        </a>
-                        <a href="{{ route('register') }}"
-                           class="relative overflow-hidden btn-shimmer inline-flex items-center justify-center px-10 py-4 bg-white/10 backdrop-blur-lg text-white font-bold text-lg rounded-2xl border-2 border-white/30 shadow-2xl hover:bg-white/20 hover:shadow-3xl hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto">
-                            Registrasi
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+                @if (Route::has('login'))
+                    @auth
+                        <a href="{{ url('/dashboard') }}"
+                           class="group relative inline-flex items-center justify-center px-8 py-3.5 text-base font-bold text-white transition-all duration-200 bg-indigo-600 rounded-full hover:bg-indigo-700 hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600">
+                            Masuk ke Dashboard
+                            <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                            </svg>
                         </a>
                     @else
-                        <a href="{{ url('/dashboard') }}"
-                           class="relative overflow-hidden btn-shimmer inline-flex items-center justify-center px-10 py-4 bg-white text-blue-600 font-bold text-lg rounded-2xl shadow-2xl hover:shadow-3xl hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto">
-                            Buka Dashboard
+                        <a href="{{ route('login') }}"
+                           class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 text-base font-bold text-white transition-all duration-200 bg-slate-900 rounded-full hover:bg-slate-800 hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900">
+                            Masuk
                         </a>
-                    @endguest
-                </div>
 
+                        @if (Route::has('register'))
+                            <a href="{{ route('register') }}"
+                               class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 text-base font-bold text-slate-700 transition-all duration-200 bg-white border border-slate-200 rounded-full hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                Registrasi
+                            </a>
+                        @endif
+                    @endauth
+                @endif
             </div>
-        </main>
+        </div>
+    </main>
 
-        <!-- Footer -->
-        <footer class="relative z-10 py-8 text-center text-white/75 text-sm">
-            <p>&copy; {{ date('Y') }} Sistem Pengelolaan Asrama. All rights reserved.</p>
-        </footer>
+    <footer class="absolute bottom-4 w-full text-center text-slate-400 text-xs">
+        &copy; {{ date('Y') }} Sistem Pengelolaan Asrama.
+    </footer>
 
-    </body>
+</body>
 </html>
