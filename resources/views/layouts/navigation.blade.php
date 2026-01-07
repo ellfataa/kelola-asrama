@@ -1,48 +1,44 @@
-<nav class="bg-white border-b border-gray-100 h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 w-full sticky top-0 z-30">
+<nav class="bg-white/80 backdrop-blur-md border-b border-slate-200 h-20 flex items-center justify-between px-4 sm:px-6 lg:px-8 w-full sticky top-0 z-20">
 
     <div class="flex items-center">
-        <button @click="sidebarOpen = !sidebarOpen" class="text-gray-500 hover:text-gray-700 focus:outline-none md:hidden">
+        <button @click="sidebarOpen = !sidebarOpen" class="text-slate-500 hover:text-slate-700 focus:outline-none md:hidden p-2 rounded-md hover:bg-slate-100 transition">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path x-show="!sidebarOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                 <path x-show="sidebarOpen" style="display: none;" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
         </button>
 
-        <div class="hidden md:block font-semibold text-gray-500">
-            Sistem Informasi Asrama
+        <div class="hidden md:block">
+            <h1 class="text-xl font-bold text-slate-800">Overview</h1>
+            <p class="text-xs text-slate-500">Selamat datang kembali, {{ Auth::user()->name }}</p>
         </div>
     </div>
 
-    <div class="flex items-center ms-6">
+    <div class="flex items-center gap-4">
+
         <x-dropdown align="right" width="48">
             <x-slot name="trigger">
-                <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                    <div class="flex items-center">
-                        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-2 font-bold">
-                            {{ substr(Auth::user()->name, 0, 1) }}
-                        </div>
-                        {{ Auth::user()->name }}
+                <button class="flex items-center gap-3 focus:outline-none group">
+                    <div class="text-right hidden sm:block">
+                        <div class="text-sm font-semibold text-slate-700 group-hover:text-indigo-600 transition">{{ Auth::user()->name }}</div>
+                        <div class="text-xs text-slate-400">Administrator</div>
                     </div>
-
-                    <div class="ms-1">
-                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                        </svg>
+                    <div class="w-10 h-10 rounded-full bg-indigo-100 border-2 border-white shadow-sm flex items-center justify-center text-indigo-600 font-bold text-lg group-hover:scale-105 transition-transform">
+                        {{ substr(Auth::user()->name, 0, 1) }}
                     </div>
                 </button>
             </x-slot>
 
             <x-slot name="content">
-                <x-dropdown-link :href="route('profile.edit')">
+                <x-dropdown-link :href="route('profile.edit')" class="hover:bg-indigo-50 hover:text-indigo-600">
                     {{ __('Profile') }}
                 </x-dropdown-link>
 
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-
                     <x-dropdown-link :href="route('logout')"
-                            onclick="event.preventDefault();
-                                        this.closest('form').submit();">
+                            class="text-red-600 hover:bg-red-50"
+                            onclick="event.preventDefault(); this.closest('form').submit();">
                         {{ __('Log Out') }}
                     </x-dropdown-link>
                 </form>
