@@ -35,9 +35,10 @@
                                 <td class="p-3 font-bold">{{ $resident->name }}</td>
                                 <td class="p-3">{{ $resident->identity_number }}</td>
                                 <td class="p-3">
-                                    <span class="bg-indigo-100 text-indigo-800 py-1 px-2 rounded text-sm font-semibold">
-                                        {{ $resident->room->number }}
-                                    </span>
+                                    <div class="flex flex-col">
+                                        <span class="font-bold text-gray-800">{{ $resident->room->number }}</span>
+                                        <span class="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded w-fit">Bed No. {{ $resident->bed_slot }}</span>
+                                    </div>
                                 </td>
                                 <td class="p-3">{{ $resident->entry_date->format('d M Y') }}</td>
                                 <td class="p-3 text-center space-x-2">

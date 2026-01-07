@@ -15,17 +15,16 @@ class Room extends Model
         return $this->hasMany(Resident::class);
     }
 
-    // Helper untuk cek apakah kamar penuh
     // Akan mengembalikan true jika jumlah penghuni >= kapasitas
+    // Cek apakah kamar penuh (Semua bed terisi)
     public function isFull()
     {
-        // Kamar penuh jika:
-        // 1. Jumlah penghuni >= Kapasitas
-        // 2. ATAU Statusnya Exclusive (Booking 1 kamar)
-        if ($this->is_exclusive) {
-            return true;
-        }
-
         return $this->residents()->count() >= $this->capacity;
+    }
+
+    // Helper untuk cek apakah slot bed tertentu (misal Bed 2) sudah terisi
+    public function isBedTaken($slotNumber)
+    {
+        return $this->residents()->where('bed_slot', $slotNumber)->exists();
     }
 }

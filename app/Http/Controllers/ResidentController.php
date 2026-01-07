@@ -10,16 +10,15 @@ class ResidentController extends Controller
 {
     public function index()
     {
-        // Ambil data penghuni beserta data kamarnya (Eager Loading) agar hemat query
+        // Eager loading room data
         $residents = Resident::with('room')->latest()->paginate(10);
         return view('residents.index', compact('residents'));
     }
 
     public function create()
     {
-        // OPTIMASI: Gunakan withCount untuk menghitung jumlah penghuni langsung dari database
-        // Ini mencegah query berulang (N+1 Problem) di dalam loop view
-        $rooms = Room::withCount('residents')->get();
+        // Ambil data kamar beserta data penghuninya untuk cek bed
+        $rooms = Room::with('residents')->get();
         return view('residents.create', compact('rooms'));
     }
 
@@ -27,20 +26,25 @@ class ResidentController extends Controller
     {
         $request->validate([
             'room_id' => 'required|exists:rooms,id',
+            'bed_slot' => 'required|integer|min:1',
             'name' => 'required|string|max:255',
-            'identity_number' => 'required|unique:residents,identity_number', // NIK/NIM harus unik
+            'identity_number' => 'required|unique:residents,identity_number',
             'phone' => 'nullable|string|max:15',
             'entry_date' => 'required|date',
         ]);
 
-        // LOGIC VALIDASI KAPASITAS (UPDATE DISINI)
         $room = Room::findOrFail($request->room_id);
 
-        // Gunakan method model isFull() yang sudah kita update
-        if ($room->isFull()) {
-            return back()
-                ->withInput()
-                ->withErrors(['room_id' => 'Kamar ' . $room->number . ' sudah penuh atau dibooking eksklusif!']);
+        // 1. Cek Validitas Nomor Bed (Tidak boleh lebih dari kapasitas)
+        if ($request->bed_slot > $room->capacity) {
+            return back()->withInput()->withErrors(['bed_slot' => 'Nomor bed tidak valid untuk kapasitas kamar ini.']);
+        }
+
+        // 2. Cek Ketersediaan Bed (Apakah bed X di kamar Y sudah ada isinya?)
+        $isBedTaken = $room->residents()->where('bed_slot', $request->bed_slot)->exists();
+
+        if ($isBedTaken) {
+            return back()->withInput()->withErrors(['bed_slot' => 'Bed nomor ' . $request->bed_slot . ' sudah terisi! Silakan pilih bed lain.']);
         }
 
         Resident::create($request->all());
@@ -50,7 +54,7 @@ class ResidentController extends Controller
 
     public function edit(Resident $resident)
     {
-        $rooms = Room::withCount('residents')->get();
+        $rooms = Room::with('residents')->get();
         return view('residents.edit', compact('resident', 'rooms'));
     }
 
@@ -58,22 +62,24 @@ class ResidentController extends Controller
     {
         $request->validate([
             'room_id' => 'required|exists:rooms,id',
+            // Bed slot optional kalau tidak ganti kamar, tapi wajib divalidasi kalau diisi
+            'bed_slot' => 'required|integer|min:1',
             'name' => 'required|string|max:255',
             'identity_number' => 'required|unique:residents,identity_number,' . $resident->id,
             'phone' => 'nullable|string|max:15',
             'entry_date' => 'required|date',
         ]);
 
-        // LOGIC VALIDASI KAPASITAS SAAT PINDAH KAMAR (UPDATE DISINI)
-        if ($request->room_id != $resident->room_id) {
-            $newRoom = Room::findOrFail($request->room_id);
+        $room = Room::findOrFail($request->room_id);
 
-            // Gunakan method model isFull()
-            if ($newRoom->isFull()) {
-                return back()
-                    ->withInput()
-                    ->withErrors(['room_id' => 'Kamar tujuan penuh atau dibooking eksklusif!']);
-            }
+        // Logic cek bed availability (kecuali bed milik sendiri)
+        $isBedTaken = $room->residents()
+                           ->where('bed_slot', $request->bed_slot)
+                           ->where('id', '!=', $resident->id) // Abaikan diri sendiri
+                           ->exists();
+
+        if ($isBedTaken) {
+            return back()->withInput()->withErrors(['bed_slot' => 'Bed nomor ' . $request->bed_slot . ' sudah terisi!']);
         }
 
         $resident->update($request->all());

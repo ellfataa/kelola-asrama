@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Registrasi Penghuni Baru') }}
+            {{ __('Edit Data Penghuni') }}
         </h2>
     </x-slot>
 
@@ -10,70 +10,67 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
 
-                    {{-- Format Data Kamar ke JSON untuk JS --}}
+                    {{-- Format Data untuk JS --}}
                     @php
                         $roomsData = [];
                         foreach($rooms as $r) {
                             $roomsData[$r->id] = [
                                 'capacity' => $r->capacity,
-                                'taken_beds' => $r->residents->pluck('bed_slot')->toArray(),
+                                'taken_beds' => $r->residents->where('id', '!=', $resident->id)->pluck('bed_slot')->toArray(), // Kecualikan diri sendiri agar bed saat ini tidak dianggap taken
                                 'price' => number_format($r->price, 0, ',', '.')
                             ];
                         }
                     @endphp
 
-                    <form action="{{ route('residents.store') }}" method="POST"
+                    <form action="{{ route('residents.update', $resident) }}" method="POST"
                           x-data="{
-                              selectedRoom: '',
-                              selectedBed: null,
+                              selectedRoom: '{{ $resident->room_id }}',
+                              selectedBed: {{ $resident->bed_slot }},
                               roomsData: {{ json_encode($roomsData) }},
 
-                              // Helper: Cek status bed
                               isBedTaken(bedNum) {
                                   if(!this.selectedRoom) return false;
                                   return this.roomsData[this.selectedRoom].taken_beds.includes(bedNum);
                               },
-
                               getCapacity() {
                                   if(!this.selectedRoom) return 0;
                                   return this.roomsData[this.selectedRoom].capacity;
                               }
                           }">
                         @csrf
+                        @method('PUT')
 
                         <div class="mb-4">
                             <label class="block font-medium text-sm text-gray-700">Nama Lengkap</label>
-                            <input type="text" name="name" class="border-gray-300 rounded-md w-full mt-1" required>
-                            @error('name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            <input type="text" name="name" value="{{ old('name', $resident->name) }}" class="border-gray-300 rounded-md w-full mt-1" required>
                         </div>
 
                         <div class="grid grid-cols-2 gap-4 mb-4">
                             <div>
                                 <label class="block font-medium text-sm text-gray-700">NIM / KTP</label>
-                                <input type="text" name="identity_number" class="border-gray-300 rounded-md w-full mt-1" required>
-                                @error('identity_number') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                <input type="text" name="identity_number" value="{{ old('identity_number', $resident->identity_number) }}" class="border-gray-300 rounded-md w-full mt-1" required>
                             </div>
                             <div>
                                 <label class="block font-medium text-sm text-gray-700">No. HP</label>
-                                <input type="text" name="phone" class="border-gray-300 rounded-md w-full mt-1">
+                                <input type="text" name="phone" value="{{ old('phone', $resident->phone) }}" class="border-gray-300 rounded-md w-full mt-1">
                             </div>
                         </div>
 
                         <div class="mb-4">
-                            <label class="block font-medium text-sm text-gray-700">Pilih Kamar</label>
+                            <label class="block font-medium text-sm text-gray-700">Pindah Kamar</label>
                             <select name="room_id" x-model="selectedRoom" @change="selectedBed = null" class="border-gray-300 rounded-md w-full mt-1">
-                                <option value="">-- Pilih Kamar --</option>
                                 @foreach($rooms as $room)
                                     @php
-                                        $sisa = $room->capacity - $room->residents->count();
-                                        $isFull = $sisa <= 0;
+                                        // Hitung sisa, tapi jika ini kamar sendiri, tambahkan 1 ke sisa (karena diri sendiri akan pindah/stay)
+                                        $isMyRoom = $resident->room_id == $room->id;
+                                        $filled = $room->residents->count();
+                                        $sisa = $room->capacity - $filled + ($isMyRoom ? 1 : 0);
                                     @endphp
-                                    <option value="{{ $room->id }}" {{ $isFull ? 'disabled' : '' }} class="{{ $isFull ? 'bg-gray-100 text-gray-400' : '' }}">
-                                        Kamar {{ $room->number }} ({{ $isFull ? 'PENUH' : 'Sisa ' . $sisa }}) - Rp {{ number_format($room->price, 0, ',', '.') }}
+                                    <option value="{{ $room->id }}" {{ $sisa <= 0 ? 'disabled' : '' }} class="{{ $sisa <= 0 ? 'bg-gray-100 text-gray-400' : '' }}">
+                                        Kamar {{ $room->number }} {{ $isMyRoom ? '(Saat Ini)' : '(Sisa ' . $sisa . ')' }}
                                     </option>
                                 @endforeach
                             </select>
-                            @error('room_id') <span class="text-red-500 text-sm font-bold">{{ $message }}</span> @enderror
                         </div>
 
                         <div x-show="selectedRoom" class="mb-6 p-4 border border-blue-200 bg-blue-50 rounded-lg" x-transition>
@@ -91,26 +88,24 @@
                                         }"
                                         class="border-2 rounded-lg p-3 flex flex-col items-center justify-center h-20 relative select-none transition-all"
                                     >
-                                        {{-- Icon Kasur --}}
                                         <svg class="w-6 h-6 mb-1" :class="isBedTaken(i) ? 'text-red-400' : (selectedBed == i ? 'text-green-600' : 'text-gray-400')" fill="currentColor" viewBox="0 0 20 20"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path></svg>
                                         <span class="text-xs font-bold" x-text="'Bed ' + i"></span>
-
                                         <span x-show="isBedTaken(i)" class="absolute top-1 right-1 text-[9px] bg-red-200 text-red-800 px-1 rounded font-bold">ISI</span>
                                     </div>
                                 </template>
                             </div>
-                            @error('bed_slot') <span class="text-red-500 text-sm block mt-2 text-center">{{ $message }}</span> @enderror
                         </div>
 
-                        <div class="flex justify-between items-end border-t pt-4">
+                        <div class="flex justify-between items-end border-t pt-4 mt-4">
                             <div class="w-1/2">
                                 <label class="block font-medium text-sm text-gray-700">Tanggal Masuk</label>
-                                <input type="date" name="entry_date" value="{{ date('Y-m-d') }}" class="border-gray-300 rounded-md w-full mt-1" required>
+                                <input type="date" name="entry_date" value="{{ old('entry_date', $resident->entry_date->format('Y-m-d')) }}" class="border-gray-300 rounded-md w-full mt-1" required>
                             </div>
 
-                            <button type="submit" :disabled="!selectedBed" :class="!selectedBed ? 'opacity-50 cursor-not-allowed bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'" class="py-2 px-6 text-white rounded font-bold transition">
-                                Simpan
-                            </button>
+                            <div class="flex gap-3">
+                                <a href="{{ route('residents.index') }}" class="py-2 px-4 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 h-10 flex items-center">Batal</a>
+                                <button type="submit" class="py-2 px-6 bg-blue-600 text-white rounded font-bold h-10">Update</button>
+                            </div>
                         </div>
 
                     </form>
