@@ -100,7 +100,7 @@
                         <div class="flex justify-between items-center mb-4">
                             <label class="font-bold text-slate-700">Pilih Posisi Bed</label>
                             <span class="text-xs font-bold bg-white border border-slate-200 px-3 py-1 rounded-full text-slate-600">
-                                Harga: Rp <span x-text="getPrice()"></span> / bln
+                                Harga: Rp <span x-text="getPrice()"></span> / semester
                             </span>
                         </div>
 

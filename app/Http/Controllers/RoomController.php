@@ -11,7 +11,7 @@ class RoomController extends Controller
     {
         // Ambil semua kamar, urutkan dari yang terbaru atau berdasarkan nama
         // withCount('residents') untuk menghitung hunian saat ini
-        $rooms = Room::withCount('residents')->orderBy('number', 'asc')->paginate(12);
+        $rooms = Room::with('residents')->withCount('residents')->orderBy('number', 'asc')->paginate(12);
 
         return view('rooms.index', compact('rooms'));
     }
@@ -61,7 +61,16 @@ class RoomController extends Controller
 
     public function destroy(Room $room)
     {
+        // CEK: Apakah kamar ini masih ada penghuninya?
+        if ($room->residents()->count() > 0) {
+            // Jika ada, batalkan proses dan kembalikan pesan error
+            return redirect()->route('rooms.index')
+                ->with('error', 'Gagal menghapus! Kamar ini masih ditempati oleh penghuni. Silakan pindahkan atau hapus penghuni terlebih dahulu.');
+        }
+
+        // Jika kosong, baru boleh dihapus
         $room->delete();
+        
         return redirect()->route('rooms.index')->with('success', 'Kamar berhasil dihapus.');
     }
 }

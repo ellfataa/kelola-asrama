@@ -62,8 +62,7 @@ class ResidentController extends Controller
     {
         $request->validate([
             'room_id' => 'required|exists:rooms,id',
-            // Bed slot optional kalau tidak ganti kamar, tapi wajib divalidasi kalau diisi
-            'bed_slot' => 'required|integer|min:1',
+            'bed_slot' => 'required|integer|min:1', // Bed slot wajib diisi dan divalidasi
             'name' => 'required|string|max:255',
             'identity_number' => 'required|unique:residents,identity_number,' . $resident->id,
             'phone' => 'nullable|string|max:15',
@@ -72,10 +71,16 @@ class ResidentController extends Controller
 
         $room = Room::findOrFail($request->room_id);
 
-        // Logic cek bed availability (kecuali bed milik sendiri)
+        // 1. Cek Kapasitas Bed Slot (Validasi Umum)
+        if ($request->bed_slot > $room->capacity) {
+             return back()->withInput()->withErrors(['bed_slot' => 'Nomor bed tidak valid untuk kapasitas kamar ini.']);
+        }
+
+        // 2. Cek Tabrakan Bed
+        // Cek apakah bed yang dipilih SUDAH ada isinya OLEH ORANG LAIN
         $isBedTaken = $room->residents()
                            ->where('bed_slot', $request->bed_slot)
-                           ->where('id', '!=', $resident->id) // Abaikan diri sendiri
+                           ->where('id', '!=', $resident->id) // Abaikan diri sendiri (jika tidak pindah bed)
                            ->exists();
 
         if ($isBedTaken) {

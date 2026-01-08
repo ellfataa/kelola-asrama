@@ -31,8 +31,8 @@
                             <div>
                                 <label class="block font-bold text-xs text-slate-500 uppercase tracking-wider mb-2">Nomor / Nama Kamar</label>
                                 <input type="text" name="number" x-model="roomNumber"
-                                       class="block w-full rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-indigo-500 focus:ring-indigo-500 py-3 transition-all duration-200"
-                                       placeholder="Contoh: A-101, Mawar-1" required>
+                                    class="block w-full rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-indigo-500 focus:ring-indigo-500 py-3 transition-all duration-200"
+                                    placeholder="Contoh: A-101, Mawar-1" required>
                                 @error('number') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
                             </div>
 
@@ -40,16 +40,16 @@
                                 <div>
                                     <label class="block font-bold text-xs text-slate-500 uppercase tracking-wider mb-2">Kapasitas (Tempat Tidur)</label>
                                     <input type="number" name="capacity" x-model="capacity" min="1" max="20"
-                                           class="block w-full rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-indigo-500 focus:ring-indigo-500 py-3 transition-all duration-200 font-bold text-slate-700" required>
+                                        class="block w-full rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-indigo-500 focus:ring-indigo-500 py-3 transition-all duration-200 font-bold text-slate-700" required>
                                 </div>
                                 <div>
-                                    <label class="block font-bold text-xs text-slate-500 uppercase tracking-wider mb-2">Harga / Bulan (Rp)</label>
+                                    <label class="block font-bold text-xs text-slate-500 uppercase tracking-wider mb-2">Harga / Semester</label>
                                     <div class="relative">
                                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                             <span class="text-gray-500 sm:text-sm">Rp</span>
                                         </div>
                                         <input type="number" name="price"
-                                               class="block w-full rounded-xl border-slate-200 bg-slate-50 pl-10 focus:bg-white focus:border-indigo-500 focus:ring-indigo-500 py-3 transition-all duration-200" required>
+                                            class="block w-full rounded-xl border-slate-200 bg-slate-50 pl-10 focus:bg-white focus:border-indigo-500 focus:ring-indigo-500 py-3 transition-all duration-200" required>
                                     </div>
                                 </div>
                             </div>
@@ -57,8 +57,8 @@
                             <div>
                                 <label class="block font-bold text-xs text-slate-500 uppercase tracking-wider mb-2">Fasilitas / Keterangan</label>
                                 <textarea name="description" rows="3"
-                                          class="block w-full rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-indigo-500 focus:ring-indigo-500 py-3 transition-all duration-200"
-                                          placeholder="AC, Lemari, WiFi..."></textarea>
+                                    class="block w-full rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-indigo-500 focus:ring-indigo-500 py-3 transition-all duration-200"
+                                    placeholder="AC, Lemari, WiFi..."></textarea>
                             </div>
 
                             <div class="pt-4 flex items-center gap-4">
@@ -90,7 +90,7 @@
                                         <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/80">
                                             <div class="flex items-center gap-3">
                                                 <div class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-700 font-bold text-sm shadow-sm">
-                                                    <span x-text="roomNumber ? roomNumber.charAt(0) : '?'"></span>
+                                                    <span x-text="roomNumber ? roomNumber.charAt(0).toUpperCase() : '?'"></span>
                                                 </div>
                                                 <span class="font-bold text-lg text-slate-800" x-text="roomNumber || 'Nama Kamar'"></span>
                                             </div>
