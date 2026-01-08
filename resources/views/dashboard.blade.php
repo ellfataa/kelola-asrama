@@ -2,11 +2,11 @@
     <x-slot name="header">
         <h2 class="font-bold text-xl text-slate-800 leading-tight flex items-center gap-2">
             <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-            {{ __('Dashboard Overview') }}
+            {{ __('Dashboard') }}
         </h2>
     </x-slot>
 
-    {{-- LOGIC PHP: Perhitungan Data Real-time (TIDAK BERUBAH) --}}
+    {{-- Perhitungan Data Real-time --}}
     @php
         $rooms = \App\Models\Room::withCount('residents')->get();
         $totalRooms = $rooms->count();
@@ -36,7 +36,7 @@
                     <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                     </div>
-                    <span class="text-xs font-bold px-2 py-1 rounded-full bg-slate-100 text-slate-500">Unit</span>
+                    <span class="text-xs font-bold px-2 py-1 rounded-full bg-slate-100 text-slate-500">Kamar</span>
                 </div>
                 <div>
                     <p class="text-sm font-medium text-slate-500 uppercase tracking-wide">Total Kamar</p>
@@ -55,12 +55,12 @@
                     <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                     </div>
-                    <span class="text-xs font-bold px-2 py-1 rounded-full bg-slate-100 text-slate-500">Person</span>
+                    <span class="text-xs font-bold px-2 py-1 rounded-full bg-slate-100 text-slate-500">Penghuni</span>
                 </div>
                 <div>
                     <p class="text-sm font-medium text-slate-500 uppercase tracking-wide">Total Penghuni</p>
                     <h3 class="text-3xl font-extrabold text-slate-800 mt-1">{{ $totalResidents }}</h3>
-                    <p class="text-sm text-slate-500 mt-2">Orang aktif terdaftar</p>
+                    <p class="text-sm text-green-500 mt-2">Orang aktif terdaftar</p>
                 </div>
             </div>
 
@@ -71,7 +71,7 @@
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
                     <div class="text-right">
-                        <span class="text-xs font-bold uppercase text-slate-400">Sisa Slot</span>
+                        <span class="text-xs font-bold uppercase text-slate-400">Sisa Tempat Tidur</span>
                         <span class="block text-lg font-bold {{ $availableSlots == 0 ? 'text-red-500' : 'text-slate-700' }}">{{ $availableSlots }}</span>
                     </div>
                 </div>
@@ -91,11 +91,11 @@
                 <div>
                     <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center">
                         Statistik Okupansi
-                        <span class="ml-2 text-xs font-normal text-slate-500 bg-slate-100 px-2 py-1 rounded-full">{{ date('F Y') }}</span>
+                        <span class="ml-2 text-xs font-normal text-slate-500 bg-yellow-100 px-2 py-1 rounded-full">{{ date('F Y') }}</span>
                     </h3>
 
                     <div class="flex items-end justify-between text-sm text-slate-600 mb-2">
-                        <span class="font-medium">Terpakai: <b class="text-indigo-600">{{ $occupiedSlots }}</b> bed</span>
+                        <span class="font-medium">Terpakai: <b class="text-indigo-600">{{ $occupiedSlots }}</b> tempat tidur</span>
                         <span class="text-xs text-slate-400">Total Kapasitas: {{ $totalCapacity }}</span>
                     </div>
 
@@ -114,13 +114,13 @@
                 <div class="mt-8 border-t border-slate-100 pt-6">
                     <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Aksi Cepat</h3>
                     <div class="grid grid-cols-1 gap-3">
-                        <a href="{{ route('residents.create') }}" class="flex items-center justify-center w-full px-4 py-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 font-bold text-sm">
+                        <a href="{{ route('residents.create') }}" class="flex items-center justify-center w-full px-4 py-3 bg-green-500 text-white rounded-xl hover:bg-green-800 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 font-bold text-sm">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
-                            Penghuni Baru
+                            Tambah Penghuni Baru
                         </a>
-                        <a href="{{ route('rooms.create') }}" class="flex items-center justify-center w-full px-4 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl hover:bg-slate-50 hover:border-slate-300 hover:shadow-sm transition-all duration-200 font-bold text-sm">
-                            <svg class="w-5 h-5 mr-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                            Tambah Unit
+                        <a href="{{ route('rooms.create') }}" class="flex items-center justify-center w-full px-4 py-3 bg-cyan-300 border border-slate-200 text-slate-700 rounded-xl hover:bg-cyan-100 hover:border-slate-300 hover:shadow-sm transition-all duration-200 font-bold text-sm">
+                            <svg class="w-5 h-5 mr-2 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                            Tambah Kamar Baru
                         </a>
                     </div>
                 </div>
