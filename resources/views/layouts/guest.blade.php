@@ -21,6 +21,17 @@
                 -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
             }
             body { font-family: 'Inter', sans-serif; }
+
+            /* Animasi halus untuk background blobs */
+            @keyframes blob {
+                0% { transform: translate(0px, 0px) scale(1); }
+                33% { transform: translate(30px, -50px) scale(1.1); }
+                66% { transform: translate(-20px, 20px) scale(0.9); }
+                100% { transform: translate(0px, 0px) scale(1); }
+            }
+            .animate-blob {
+                animation: blob 7s infinite;
+            }
         </style>
     </head>
     <body class="text-slate-900 antialiased bg-white h-screen flex items-center justify-center relative overflow-hidden">
@@ -28,18 +39,20 @@
         <div class="fixed inset-0 z-0 pointer-events-none">
             <div class="absolute inset-0 bg-grid-pattern opacity-[0.4]"></div>
             <div class="absolute top-0 -left-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
-            <div class="absolute top-0 -right-4 w-72 h-72 bg-indigo-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+            <div class="absolute top-0 -right-4 w-72 h-72 bg-indigo-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob" style="animation-delay: 2s"></div>
+            <div class="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob" style="animation-delay: 4s"></div>
         </div>
 
-        <div class="w-full sm:max-w-lg px-6 py-8 bg-white/80 backdrop-blur-xl shadow-2xl border border-white/50 sm:rounded-3xl relative z-10 mx-4">
+        <div class="w-full sm:max-w-lg px-8 py-10 bg-white/80 backdrop-blur-xl shadow-2xl border border-white/50 sm:rounded-3xl relative z-10 mx-4 transition-all duration-300 hover:shadow-indigo-500/10">
 
-            <div class="flex justify-center mb-6">
-                <a href="/" class="flex items-center gap-2 group">
-                    <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-                            <path d="M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a.75.75 0 101.06-1.06l-8.689-8.69a2.25 2.25 0 00-3.182 0l-8.69 8.69a.75.75 0 001.061 1.06l8.69-8.69z" />
-                            <path d="M12 5.432l8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 01-.75-.75v-4.5a.75.75 0 00-.75-.75h-3a.75.75 0 00-.75.75V21a.75.75 0 01-.75.75H5.625a1.875 1.875 0 01-1.875-1.875v-6.198a2.29 2.29 0 00.091-.086L12 5.43z" />
-                        </svg>
+            <div class="flex justify-center mb-8">
+                <a href="/" class="group relative">
+                    <div class="absolute inset-0 bg-indigo-500 rounded-2xl blur-lg opacity-20 group-hover:opacity-40 transition duration-500"></div>
+
+                    <div class="relative w-24 h-24 bg-white rounded-2xl shadow-lg border border-slate-100 flex items-center justify-center transform group-hover:scale-105 transition duration-300">
+                        <img src="{{ asset('assets/images/logo-amn.webp') }}"
+                             alt="Logo AMN"
+                             class="w-16 h-16 object-contain drop-shadow-sm">
                     </div>
                 </a>
             </div>

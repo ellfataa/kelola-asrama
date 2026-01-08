@@ -1,12 +1,12 @@
 <x-guest-layout>
     <div class="text-center mb-6">
         <h2 class="text-2xl font-bold text-slate-800">Selamat Datang</h2>
-        <p class="text-sm text-slate-500">Silakan masuk ke akun Anda</p>
+        <p class="text-sm text-slate-500">Silakan masuk untuk melanjutkan.</p>
     </div>
 
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <form method="POST" action="{{ route('login') }}" class="space-y-5">
+    <form method="POST" action="{{ route('login') }}" class="space-y-6">
         @csrf
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -35,14 +35,6 @@
                               placeholder="••••••••" />
                 <x-input-error :messages="$errors->get('password')" class="mt-1" />
             </div>
-        </div>
-
-        <div class="flex justify-end items-center">
-            @if (Route::has('password.request'))
-                <a class="text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:underline transition" href="{{ route('password.request') }}">
-                    {{ __('Lupa password?') }}
-                </a>
-            @endif
         </div>
 
         <div class="grid grid-cols-2 gap-4 pt-2">

@@ -7,6 +7,11 @@
 
         <title>{{ config('app.name', 'Sistem Asrama') }}</title>
 
+        {{-- FIREBASE --}}
+        <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
+
+
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet" />
 
@@ -47,5 +52,8 @@
             </div>
 
         </div>
+
+        <!-- Custom Firebase JS -->
+        <script src="{{ asset('js/firebase.js') }}"></script>
     </body>
 </html>

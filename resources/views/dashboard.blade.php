@@ -9,14 +9,14 @@
     @php
         // 1. Ambil Semua Data Kamar
         $rooms = \App\Models\Room::withCount('residents')->get();
-        
+
         // 2. Variabel Statistik Dasar
         $totalRooms = $rooms->count();
         $totalResidents = \App\Models\Resident::count();
-        $totalCapacity = $rooms->sum('capacity'); 
-        
+        $totalCapacity = $rooms->sum('capacity');
+
         // 3. Hitung Slot Terpakai & Tersedia
-        $occupiedSlots = $rooms->sum('residents_count'); 
+        $occupiedSlots = $rooms->sum('residents_count');
         $availableSlots = $totalCapacity - $occupiedSlots;
         if($availableSlots < 0) $availableSlots = 0;
 
@@ -45,7 +45,7 @@
 
         {{-- ROW 1: STATISTIK UTAMA --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
+
             {{-- Card Total Kamar --}}
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col justify-between hover:shadow-md transition-shadow">
                 <div class="flex justify-between items-start mb-4">
@@ -92,7 +92,7 @@
                     </div>
                 </div>
                 <div class="flex justify-between items-center text-sm font-medium border-t border-slate-50 pt-3 mt-1">
-                    <span class="text-indigo-600">Per Bulan (Aktif)</span>
+                    <span class="text-indigo-600">Per Semester (Aktif)</span>
                     <span class="text-slate-400 text-xs">Sisa Bed: <b class="text-slate-600 text-sm">{{ $availableSlots }}</b></span>
                 </div>
             </div>
@@ -116,11 +116,11 @@
 
                     {{-- Modern Progress Bar --}}
                     <div class="w-full bg-slate-100 rounded-full h-4 overflow-hidden shadow-inner mb-4">
-                        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 h-4 rounded-full flex items-center justify-center transition-all duration-1000 ease-out shadow-lg shadow-indigo-200" 
+                        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 h-4 rounded-full flex items-center justify-center transition-all duration-1000 ease-out shadow-lg shadow-indigo-200"
                              style="width: {{ $occupancyRate }}%">
                         </div>
                     </div>
-                    
+
                     <div class="flex justify-center items-baseline gap-1 mb-8">
                         <span class="text-4xl font-extrabold text-slate-800">{{ $occupancyRate }}</span>
                         <span class="text-xl font-bold text-slate-400">%</span>

@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\ResidentController;
+use App\Http\Controllers\FirebaseNotificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -26,5 +27,7 @@ Route::middleware('auth')->group(function () {
     // 2. Route untuk Data Penghuni (URL: /residents)
     Route::resource('residents', ResidentController::class);
 });
+
+Route::get('/test-firebase', [FirebaseNotificationController::class, 'send']);
 
 require __DIR__.'/auth.php';
