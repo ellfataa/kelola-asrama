@@ -1,74 +1,191 @@
-<x-guest-layout>
-    <div class="text-center mb-6">
-        <h2 class="text-2xl font-bold text-slate-800">Selamat Datang</h2>
-        <p class="text-sm text-slate-500">Silakan masuk untuk melanjutkan.</p>
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <title>{{ config('app.name', 'Laravel') }} - Login Mitra</title>
+
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet" />
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="text-slate-900 antialiased bg-white min-h-screen flex overflow-hidden">
+
+    {{-- KOLOM KIRI: Branding & Logo --}}
+    <div class="hidden lg:flex lg:w-5/12 bg-slate-50 relative flex-col items-center justify-center p-8 text-center border-r border-slate-100">
+        <div class="absolute inset-0" style="background-image: radial-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px); background-size: 24px 24px;"></div>
+        <div class="absolute -top-32 -left-32 w-96 h-96 bg-indigo-100/70 rounded-full mix-blend-multiply filter blur-3xl"></div>
+        <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-blue-100/70 rounded-full mix-blend-multiply filter blur-3xl"></div>
+
+        <div class="relative z-10 flex flex-col items-center">
+            <p class="text-indigo-600 text-[18px] font-extrabold tracking-widest uppercase mb-6">
+                Kelola Asrama Kampus
+            </p>
+
+            <div class="w-32 h-32 bg-white rounded-[2rem] p-6 shadow-xl shadow-slate-200/50 border border-slate-100 mb-8 transform transition duration-500 hover:-translate-y-1.5">
+                <img src="{{ asset('assets/images/logo-amn.webp') }}" alt="Logo AMN" class="w-full h-full object-contain">
+            </div>
+
+            <h1 class="text-3xl font-extrabold text-slate-900 leading-tight">
+                Akademi Maritim Nusantara<br>Cilacap
+            </h1>
+        </div>
     </div>
 
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    {{-- KOLOM KANAN: Form Login --}}
+    <div class="w-full lg:w-7/12 flex flex-col h-screen relative bg-white overflow-y-auto">
 
-    <form method="POST" action="{{ route('login') }}" class="space-y-6">
-        @csrf
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-            <div>
-                <x-input-label for="email" :value="__('Email')" class="text-slate-700 font-semibold text-xs uppercase tracking-wide mb-1" />
-                <x-text-input id="email"
-                              class="block w-full rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-indigo-500 focus:ring-indigo-500 py-2.5 px-4 transition-all duration-200 text-sm"
-                              type="email"
-                              name="email"
-                              :value="old('email')"
-                              required autofocus
-                              autocomplete="username"
-                              placeholder="nama@email.com" />
-                <x-input-error :messages="$errors->get('email')" class="mt-1" />
+        <div class="flex items-center justify-between p-6 sm:p-8 shrink-0">
+            <div class="lg:hidden flex items-center gap-3">
+                <div class="w-12 h-12 bg-white border border-slate-100 rounded-xl p-2 shadow-sm">
+                    <img src="{{ asset('assets/images/logo-amn.webp') }}" alt="Logo AMN" class="w-full h-full object-contain">
+                </div>
             </div>
 
-            <div>
-                <x-input-label for="password" :value="__('Password')" class="text-slate-700 font-semibold text-xs uppercase tracking-wide mb-1" />
-                <x-text-input id="password"
-                              class="block w-full rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-indigo-500 focus:ring-indigo-500 py-2.5 px-4 transition-all duration-200 text-sm"
-                              type="password"
-                              name="password"
-                              required
-                              autocomplete="current-password"
-                              placeholder="••••••••" />
-                <x-input-error :messages="$errors->get('password')" class="mt-1" />
-            </div>
-        </div>
+            <div class="hidden lg:block"></div>
 
-        <div class="grid grid-cols-2 gap-4 pt-2">
-            <a href="/" class="inline-flex justify-center items-center px-4 py-3 bg-white border border-slate-300 rounded-xl font-bold text-sm text-slate-700 uppercase tracking-widest hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-sm hover:-translate-y-0.5">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 mr-2">
+            {{-- Tombol Kembali --}}
+            <a href="/" class="flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-indigo-600 transition-all duration-300 group bg-slate-50 hover:bg-indigo-50 px-4 py-2 rounded-full border border-slate-100">
+                <svg class="w-4 h-4 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                 </svg>
-                {{ __('Kembali') }}
+                Kembali
             </a>
-
-            <button type="submit" class="inline-flex justify-center items-center px-4 py-3 bg-slate-900 border border-transparent rounded-xl font-bold text-sm text-white uppercase tracking-widest hover:bg-slate-800 active:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-lg hover:shadow-xl hover:-translate-y-0.5">
-                {{ __('Masuk') }}
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 ml-2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                </svg>
-            </button>
         </div>
 
-        <div class="relative mt-6">
-            <div class="absolute inset-0 flex items-center">
-                <div class="w-full border-t border-slate-200"></div>
+        {{-- Form Container --}}
+        <div class="flex-1 flex flex-col justify-center px-6 sm:px-12 py-2 my-auto w-full max-w-[680px] mx-auto">
+            {{-- Header Form --}}
+            <div class="mb-5 text-left">
+                <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">Login Akun</h2>
+                <p class="text-sm text-slate-500 font-medium">Selamat datang! Silakan login dengan akun Anda untuk melanjutkan ke halaman utama.</p>
             </div>
-            <div class="relative flex justify-center text-sm">
-                <span class="bg-white px-2 text-slate-400">Atau</span>
-            </div>
-        </div>
 
-        <div class="text-center mt-4 pb-2">
-            <p class="text-sm text-slate-600">
-                Belum punya akun?
-                <a href="{{ route('register') }}" class="font-bold text-indigo-600 hover:text-indigo-800 hover:underline transition">
-                    Daftar Sekarang
-                </a>
-            </p>
+            <form method="POST" action="{{ route('login') }}" class="space-y-5">
+                @csrf
+
+                {{-- Input Email --}}
+                <div>
+                    <label for="email" class="block text-slate-700 font-bold text-xs uppercase tracking-wider mb-2">Email</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                            </svg>
+                        </div>
+                        <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username" placeholder="admin@kampus.ac.id"
+                               class="block w-full rounded-xl border-slate-200 bg-slate-50 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 py-3 pl-11 pr-4 transition-all duration-200 text-sm font-medium placeholder-slate-400">
+                    </div>
+                </div>
+
+                {{-- Input Password --}}
+                <div x-data="{ showPassword: false }">
+                    <div class="flex justify-between items-center mb-2">
+                        <label for="password" class="block text-slate-700 font-bold text-xs uppercase tracking-wider">Password</label>
+                        {{-- @if (Route::has('password.request'))
+                            <a href="{{ route('password.request') }}" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors hover:underline">
+                                Lupa password?
+                            </a>
+                        @endif --}}
+                    </div>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                            </svg>
+                        </div>
+
+                        <input id="password" name="password" required autocomplete="current-password" placeholder="••••••••"
+                            x-bind:type="showPassword ? 'text' : 'password'"
+                            class="block w-full rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 py-3 pl-11 pr-12 transition-all duration-200 text-sm font-medium placeholder-slate-400">
+
+                        <button type="button" @click="showPassword = !showPassword" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none transition-colors" aria-label="Toggle password visibility">
+                            {{-- Icon Mata Terbuka --}}
+                            <svg x-show="!showPassword" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.107.424.107.639a1.012 1.012 0 01-.1.639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178a1.012 1.012 0 01-.001-.639z M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            {{-- Icon Mata Tertutup (Tercoret) --}}
+                            <svg x-show="showPassword" x-cloak class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"></path></svg>
+                        </button>
+                    </div>
+                    @error('password') <span class="text-red-500 text-xs mt-1.5 font-medium block">{{ $message }}</span> @enderror
+                </div>
+
+                {{-- Remember Me Checkbox --}}
+                {{-- <div class="block pt-1">
+                    <label for="remember_me" class="inline-flex items-center group cursor-pointer">
+                        <input id="remember_me" type="checkbox" class="w-4 h-4 rounded border-slate-300 text-indigo-600 shadow-sm focus:ring-indigo-500 transition-colors cursor-pointer" name="remember">
+                        <span class="ml-2 text-sm text-slate-600 group-hover:text-slate-900 transition-colors font-medium">{{ __('Ingat Saya') }}</span>
+                    </label>
+                </div> --}}
+
+                {{-- Tombol Action --}}
+                <div class="pt-4">
+                    <button type="submit" class="w-full flex justify-center items-center px-4 py-3.5 bg-indigo-600 border border-transparent rounded-xl font-bold text-sm text-white uppercase tracking-wider hover:bg-indigo-700 active:bg-indigo-800 focus:outline-none focus:ring-4 focus:ring-indigo-500/30 transition-all duration-200 shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5">
+                        {{ __('Login') }}
+                    </button>
+                </div>
+
+                {{-- Register Link --}}
+                <div class="text-center mt-8 pt-6 pb-8 border-t border-slate-100">
+                    <p class="text-sm text-slate-600 font-medium">
+                        Belum memiliki akun?
+                        <a href="{{ route('register') }}" class="font-bold text-indigo-600 hover:text-indigo-800 transition-colors ml-1 hover:underline">
+                            Register di sini
+                        </a>
+                    </p>
+                </div>
+
+            </form>
         </div>
-    </form>
-</x-guest-layout>
+    </div>
+
+    {{-- Script untuk Pop Up Login Gagal --}}
+    @if(session('login_error'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'error',
+                    text: "{{ session('login_error') }}",
+                    confirmButtonText: 'Coba Lagi',
+                    confirmButtonColor: '#ef4444',
+                    customClass: {
+                        popup: 'rounded-2xl',
+                        confirmButton: 'rounded-xl font-bold px-6 py-2.5'
+                    }
+                });
+            });
+        </script>
+    @endif
+
+    {{-- Script untuk Pop Up Login Berhasil dan Redirect ke Dashboard --}}
+    @if(!empty($login_success))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'success',
+                    text: 'Anda Berhasil Melakukan Login',
+                    confirmButtonText: 'Ke Halaman Dashboard',
+                    confirmButtonColor: '#4f46e5',
+                    allowOutsideClick: false,
+                    customClass: {
+                        popup: 'rounded-2xl',
+                        confirmButton: 'rounded-xl font-bold px-6 py-2.5'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "{!! $redirect_url ?? route('dashboard') !!}";
+                    }
+                });
+            });
+        </script>
+    @endif
+
+</body>
+</html>

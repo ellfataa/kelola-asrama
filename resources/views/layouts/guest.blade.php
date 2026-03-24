@@ -5,60 +5,64 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ config('app.name', 'Laravel') }} - Mitra Portal</title>
 
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet" />
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
         <style>
-            .bg-grid-pattern {
-                background-image: linear-gradient(to right, #e2e8f0 1px, transparent 1px),
-                                  linear-gradient(to bottom, #e2e8f0 1px, transparent 1px);
-                background-size: 40px 40px;
-                mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
-                -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
-            }
             body { font-family: 'Inter', sans-serif; }
-
-            /* Animasi halus untuk background blobs */
-            @keyframes blob {
-                0% { transform: translate(0px, 0px) scale(1); }
-                33% { transform: translate(30px, -50px) scale(1.1); }
-                66% { transform: translate(-20px, 20px) scale(0.9); }
-                100% { transform: translate(0px, 0px) scale(1); }
-            }
-            .animate-blob {
-                animation: blob 7s infinite;
+            .bg-grid {
+                background-image: radial-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+                background-size: 24px 24px;
             }
         </style>
     </head>
-    <body class="text-slate-900 antialiased bg-white h-screen flex items-center justify-center relative overflow-hidden">
+    <body class="text-slate-900 antialiased bg-white min-h-screen flex overflow-x-hidden">
 
-        <div class="fixed inset-0 z-0 pointer-events-none">
-            <div class="absolute inset-0 bg-grid-pattern opacity-[0.4]"></div>
-            <div class="absolute top-0 -left-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
-            <div class="absolute top-0 -right-4 w-72 h-72 bg-indigo-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob" style="animation-delay: 2s"></div>
-            <div class="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob" style="animation-delay: 4s"></div>
-        </div>
+        {{-- KOLOM KIRI: Branding (Hanya Desktop) --}}
+        <div class="hidden lg:flex lg:w-5/12 bg-slate-50/80 relative flex-col items-center justify-center p-8 text-center border-r border-slate-100">
 
-        <div class="w-full sm:max-w-lg px-8 py-10 bg-white/80 backdrop-blur-xl shadow-2xl border border-white/50 sm:rounded-3xl relative z-10 mx-4 transition-all duration-300 hover:shadow-indigo-500/10">
+            {{-- Background Ornamen --}}
+            <div class="absolute inset-0 bg-grid"></div>
+            <div class="absolute -top-32 -left-32 w-96 h-96 bg-indigo-100/70 rounded-full mix-blend-multiply filter blur-3xl"></div>
+            <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-blue-100/70 rounded-full mix-blend-multiply filter blur-3xl"></div>
 
-            <div class="flex justify-center mb-8">
-                <a href="/" class="group relative">
-                    <div class="absolute inset-0 bg-indigo-500 rounded-2xl blur-lg opacity-20 group-hover:opacity-40 transition duration-500"></div>
+            {{-- Konten Utama --}}
+            <div class="relative z-10 flex flex-col items-center">
+                <p class="text-indigo-600 text-[10px] font-extrabold tracking-widest uppercase mb-6">
+                    Portal Mitra Asrama
+                </p>
 
-                    <div class="relative w-24 h-24 bg-white rounded-2xl shadow-lg border border-slate-100 flex items-center justify-center transform group-hover:scale-105 transition duration-300">
-                        <img src="{{ asset('assets/images/logo-amn.webp') }}"
-                             alt="Logo AMN"
-                             class="w-16 h-16 object-contain drop-shadow-sm">
-                    </div>
-                </a>
+                <div class="w-28 h-28 bg-white rounded-3xl p-5 shadow-xl shadow-slate-200/50 border border-slate-100 mb-6 transform transition duration-500 hover:-translate-y-1.5">
+                    <img src="{{ asset('assets/images/logo-amn.webp') }}" alt="Logo AMN" class="w-full h-full object-contain">
+                </div>
+
+                <h1 class="text-2xl font-extrabold text-slate-900 leading-tight">
+                    Akademi Maritim Nusantara<br>Cilacap
+                </h1>
             </div>
 
-            {{ $slot }}
+        </div>
+
+        {{-- KOLOM KANAN: Form Area --}}
+        <div class="w-full lg:w-7/12 flex items-center justify-center p-6 relative bg-white">
+
+            {{-- Logo Mobile (Hanya muncul di HP) --}}
+            <div class="absolute top-5 left-5 lg:hidden flex items-center gap-3 z-20">
+                <div class="w-10 h-10 bg-white border border-slate-100 rounded-xl p-1.5 shadow-sm">
+                    <img src="{{ asset('assets/images/logo-amn.webp') }}" alt="Logo AMN" class="w-full h-full object-contain">
+                </div>
+            </div>
+
+            {{-- Container Form (Margin dikurangi) --}}
+            <div class="w-full max-w-md mt-10 lg:mt-0 relative z-10">
+                {{ $slot }}
+            </div>
 
         </div>
+
     </body>
 </html>

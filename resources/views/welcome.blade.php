@@ -39,20 +39,11 @@
                 }
             }
         </script>
-        <style>
-            .bg-grid-pattern {
-                background-image: linear-gradient(to right, #e2e8f0 1px, transparent 1px),
-                                  linear-gradient(to bottom, #e2e8f0 1px, transparent 1px);
-                background-size: 40px 40px;
-                mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
-                -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
-            }
-        </style>
     @endif
 </head>
-<body class="h-full bg-white text-slate-900 antialiased selection:bg-indigo-500 selection:text-white relative">
+<body class="h-full bg-slate-50 text-slate-900 antialiased selection:bg-indigo-500 selection:text-white relative flex flex-col items-center justify-center overflow-hidden">
 
-    {{-- Toast Notification (Jika Logout) --}}
+    {{-- Notifikasi (Jika Logout) --}}
     @if (session('status'))
         <div x-data="{ show: true }"
              x-show="show"
@@ -72,85 +63,79 @@
     @endif
 
     {{-- Background Effects --}}
-    <div class="fixed inset-0 z-0 pointer-events-none">
-        <div class="absolute inset-0 bg-grid-pattern opacity-[0.4]"></div>
-        <div class="absolute top-0 -left-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
-        <div class="absolute top-0 -right-4 w-72 h-72 bg-indigo-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
-        <div class="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+    <div class="fixed inset-0 z-0 pointer-events-none flex items-center justify-center">
+        <div class="absolute inset-0" style="background-image: radial-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px); background-size: 24px 24px;"></div>
+        <div class="absolute w-[30rem] h-[30rem] bg-indigo-100/70 rounded-full mix-blend-multiply filter blur-3xl animate-blob -ml-64 -mt-64"></div>
+        <div class="absolute w-[30rem] h-[30rem] bg-blue-100/70 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000 ml-64 mt-64"></div>
     </div>
 
-    {{-- Navbar --}}
-    <nav class="relative z-50 w-full px-6 py-8 flex justify-between items-center max-w-7xl mx-auto">
-        <div class="flex items-center gap-4 group cursor-default">
-            {{-- Logo Container Besar --}}
-            <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/10 border border-slate-100 transform group-hover:scale-105 transition duration-300">
-                <img src="{{ asset('assets/images/logo-amn.webp') }}" alt="Logo AMN" class="w-9 h-9 object-contain">
-            </div>
-
-            {{-- Brand Text --}}
-            <div class="flex flex-col">
-                <span class="font-extrabold text-2xl tracking-tight text-slate-900 leading-none">Asrama AMN</span>
-                <span class="text-xs font-bold text-indigo-600 tracking-[0.2em] uppercase mt-1">Cilacap</span>
-            </div>
-        </div>
-    </nav>
-
     {{-- Main Content --}}
-    <main class="relative z-10 flex flex-col justify-center items-center min-h-[75vh] px-4 sm:px-6 lg:px-8">
-        <div class="w-full max-w-4xl text-center space-y-8 animate-fade-in-up">
+    <main class="relative z-10 w-full max-w-3xl mx-auto px-6 flex flex-col items-center text-center animate-fade-in-up">
+        {{-- Centered Logo --}}
+        <div class="w-24 h-24 sm:w-28 sm:h-28 bg-white rounded-[2rem] p-5 shadow-xl shadow-slate-200/50 border border-slate-100 mb-8 transform transition duration-500 hover:-translate-y-1.5 flex items-center justify-center">
+            <img src="{{ asset('assets/images/logo-amn.webp') }}" alt="Logo AMN" class="w-full h-full object-contain">
+        </div>
 
-            {{-- Badge --}}
-            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-indigo-100 shadow-sm text-indigo-600 text-xs font-bold uppercase tracking-wider mb-2">
-                <span class="relative flex h-2.5 w-2.5">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-indigo-500"></span>
-                </span>
-                Sistem Informasi Manajemen
-            </div>
+        {{-- Headline Singkat --}}
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight mb-4">
+            Kelola Asrama <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-500">Lebih Modern</span>
+        </h1>
 
-            {{-- Headline --}}
-            <h1 class="text-5xl md:text-7xl font-extrabold text-slate-900 tracking-tight leading-tight">
-                Kelola Asrama dengan
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">Lebih Cerdas</span>
-            </h1>
+        {{-- Subheadline Singkat --}}
+        <p class="text-base sm:text-lg text-slate-500 max-w-xl mx-auto mb-10 leading-relaxed font-medium">
+            Platform terpadu untuk kemudahan pengelolaan fasilitas asrama<br> AMN Cilacap
+        </p>
 
-            {{-- Subheadline --}}
-            <p class="text-lg md:text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed">
-                Platform terintegrasi untuk pendaftaran, monitoring penghuni, dan manajemen fasilitas asrama dalam satu dashboard yang modern.
-            </p>
+        {{-- CTA Buttons --}}
+        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center w-full sm:w-auto">
+            @if (Route::has('login'))
+                @auth
+                    <a href="{{ url('/dashboard') }}"
+                       class="w-full sm:w-auto group relative inline-flex items-center justify-center px-8 py-3.5 text-sm sm:text-base font-bold text-white transition-all duration-200 bg-indigo-600 rounded-xl hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-indigo-500/30">
+                        Ke Dashboard Utama
+                        <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                        </svg>
+                    </a>
+                @else
+                    <a href="{{ route('login') }}"
+                       class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 text-sm sm:text-base font-bold text-white transition-all duration-200 bg-indigo-600 rounded-xl hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-indigo-500/30 uppercase tracking-wide">
+                        Login
+                    </a>
 
-            {{-- CTA Buttons --}}
-            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
-                @if (Route::has('login'))
-                    @auth
-                        <a href="{{ url('/dashboard') }}"
-                           class="group relative inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white transition-all duration-200 bg-indigo-600 rounded-2xl hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-500/30 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600">
-                            Masuk ke Dashboard
-                            <svg class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                            </svg>
+                    @if (Route::has('register'))
+                        <a href="{{ route('register') }}"
+                           class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 text-sm sm:text-base font-bold text-slate-700 transition-all duration-200 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 hover:text-indigo-600 hover:border-indigo-300 hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-indigo-500/20 uppercase tracking-wide">
+                            Register
                         </a>
-                    @else
-                        <a href="{{ route('login') }}"
-                           class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white transition-all duration-200 bg-slate-900 rounded-2xl hover:bg-slate-800 hover:shadow-xl hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900">
-                            Masuk
-                        </a>
-
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}"
-                               class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-base font-bold text-slate-700 transition-all duration-200 bg-white border border-slate-200 rounded-2xl hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                Registrasi
-                            </a>
-                        @endif
-                    @endauth
-                @endif
-            </div>
+                    @endif
+                @endauth
+            @endif
         </div>
     </main>
 
-    <footer class="absolute bottom-6 w-full text-center text-slate-400 text-xs font-medium">
-        &copy; {{ date('Y') }} Sistem Pengelolaan Asrama AMN Cilacap.
+    {{-- Footer --}}
+    <footer class="absolute bottom-6 w-full text-center px-4">
+        <p class="text-slate-400 text-[11px] sm:text-xs font-medium tracking-wide">
+            &copy; {{ date('Y') }} Akademi Maritim Nusantara (AMN) Cilacap.
+        </p>
     </footer>
+
+    {{-- Script notifikasi hapus akun --}}
+    @if (session('status') === 'account-deleted')
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Akun Anda Berhasil Dihapus.',
+                    confirmButtonColor: '#4f46e5',
+                    confirmButtonText: 'Tutup'
+                });
+            });
+        </script>
+    @endif
 
 </body>
 </html>

@@ -26,7 +26,18 @@ Route::middleware('auth')->group(function () {
 
     // 2. Route untuk Data Penghuni (URL: /residents)
     Route::resource('residents', ResidentController::class);
-});
+
+    // Route untuk form perpanjang asrama
+    Route::get('/residents/{resident}/extend', [ResidentController::class, 'extend'])->name('residents.extend');
+    Route::put('/residents/{resident}/extend', [ResidentController::class, 'updateExtension'])->name('residents.updateExtension');
+
+    // Route untuk form keluar asrama
+    Route::get('/residents/{resident}/checkout', [App\Http\Controllers\ResidentController::class, 'checkout'])->name('residents.checkout');
+    Route::post('/residents/{resident}/checkout', [App\Http\Controllers\ResidentController::class, 'processCheckout'])->name('residents.processCheckout');
+
+    // Route Data Taruna Keluar (Sesuai Sidebar)
+    Route::get('/taruna-keluar', [App\Http\Controllers\ResidentOutController::class, 'index'])->name('resident_outs.index');
+    });
 
 Route::get('/test-firebase', [FirebaseNotificationController::class, 'send']);
 

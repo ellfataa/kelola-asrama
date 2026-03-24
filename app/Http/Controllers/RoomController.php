@@ -10,8 +10,7 @@ class RoomController extends Controller
 {
     public function index()
     {
-        // Ambil semua kamar, urutkan dari yang terbaru atau berdasarkan nama
-        // withCount('residents') untuk menghitung hunian saat ini
+        // Ambil semua kamar beserta penghuninya, urutkan berdasarkan nama/nomor kamar
         $rooms = Room::with('residents')->withCount('residents')->orderBy('number', 'asc')->paginate(12);
 
         return view('rooms.index', compact('rooms'));
@@ -24,19 +23,23 @@ class RoomController extends Controller
 
     public function store(Request $request)
     {
-        // Bersihkan format harga
         $request->merge([ 'price' => str_replace('.', '', $request->price) ]);
 
         $request->validate([
-            'number' => 'required|unique:rooms,number|max:10',
-            'capacity' => 'required|integer|min:1|max:20', // Batasi maks bed per kamar agar UI tidak rusak
+            'number' => 'required|unique:rooms,number|max:255',
+            'capacity' => 'required|integer|min:1|max:20',
             'price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
         ]);
 
-        Room::create($request->all());
+        $data = $request->all();
 
-        return redirect()->route('rooms.index')->with('success', 'Kamar dan Slot Tempat Tidur berhasil dibuat.');
+        // Suntikan nilai default untuk mencegah error pada kolom database yang memerlukan angka
+        $data['location_code'] = 1;
+
+        Room::create($data);
+
+        return redirect()->route('rooms.index')->with('success', 'Data Kamar berhasil dibuat!');
     }
 
     public function edit(Room $room)
@@ -49,85 +52,78 @@ class RoomController extends Controller
         $request->merge([ 'price' => str_replace('.', '', $request->price) ]);
 
         $request->validate([
-            'number' => 'required|max:10|unique:rooms,number,' . $room->id,
+            'number' => 'required|max:255|unique:rooms,number,' . $room->id,
             'capacity' => 'required|integer|min:1|max:20',
             'price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
         ]);
 
-        // 1. VALIDASI JUMLAH PENGHUNI
-        // Kita hanya mencegah jika kapasitas baru < JUMLAH ORANG.
-        // Posisi bed tidak masalah, nanti kita atur ulang.
+        // 1. Validasi: Kapasitas baru tidak boleh lebih kecil dari jumlah TOTAL penghuni saat ini
         $totalResidents = $room->residents()->count();
-
         if ($request->capacity < $totalResidents) {
             return back()
                 ->withInput()
                 ->withErrors([
-                    'capacity' => "Tidak bisa mengurangi kapasitas menjadi {$request->capacity}! Saat ini ada {$totalResidents} penghuni. Minimal kapasitas harus {$totalResidents}."
+                    'capacity' => "Tidak bisa mengurangi kapasitas kamar menjadi {$request->capacity}! Saat ini masih ada {$totalResidents} taruna di dalam kamar."
                 ]);
         }
 
-        // Gunakan Transaction agar data aman
+        // Gunakan Transaction agar jika terjadi error, database tidak berantakan
         DB::transaction(function () use ($request, $room) {
+            $newCapacity = $request->capacity;
 
-            // 2. LOGIC RE-SLOTTING (PEMADATAN BED)
-            // Jika kapasitas dikurangi, cek apakah ada penghuni yang "tertinggal" di bed nomor tinggi
-            if ($request->capacity < $room->capacity) {
-
-                // Ambil penghuni yang posisinya di luar kapasitas baru (Misal: Kapasitas baru 2, ambil penghuni di bed 3, 4, 5...)
+            // 2. Logika Pemadatan Bed
+            if ($newCapacity < $room->capacity) {
+                // Cari taruna yang posisinya tergusur (Misal: Kasur no 3, padahal kapasitas baru hanya sampai 2)
                 $strandedResidents = $room->residents()
-                                          ->where('bed_slot', '>', $request->capacity)
+                                          ->where('bed_slot', '>', $newCapacity)
                                           ->orderBy('bed_slot', 'asc')
                                           ->get();
 
                 if ($strandedResidents->count() > 0) {
-                    // Cari slot kosong di dalam range kapasitas baru (Misal: 1 sampai 2)
-
-                    // Ambil bed yang SUDAH terisi di range aman (1-2)
+                    // Cari tahu kasur nomor berapa saja yang sudah ADA ISINYA di area yang aman (1 s.d Kapasitas Baru)
                     $takenSlots = $room->residents()
-                                       ->where('bed_slot', '<=', $request->capacity)
+                                       ->where('bed_slot', '<=', $newCapacity)
                                        ->pluck('bed_slot')
                                        ->toArray();
 
-                    // Cari angka 1 sampai X yang tidak ada di takenSlots
+                    // Kumpulkan sisa kasur yang KOSONG di area aman tersebut
                     $emptySlots = [];
-                    for ($i = 1; $i <= $request->capacity; $i++) {
+                    for ($i = 1; $i <= $newCapacity; $i++) {
                         if (!in_array($i, $takenSlots)) {
                             $emptySlots[] = $i;
                         }
                     }
 
-                    // Pindahkan penghuni terlantar ke slot kosong
+                    // Pindahkan taruna yang tergusur ke kasur kosong yang sudah disiapkan
                     foreach ($strandedResidents as $index => $resident) {
                         if (isset($emptySlots[$index])) {
-                            $resident->update([
-                                'bed_slot' => $emptySlots[$index]
-                            ]);
+                            $resident->bed_slot = $emptySlots[$index];
+                            $resident->save();
                         }
                     }
                 }
             }
 
-            // 3. Update Data Kamar
-            $room->update($request->all());
+            // 3. Simpan perubahan utama kamar
+            $data = $request->only(['number', 'capacity', 'price', 'description']);
+            $data['location_code'] = $room->location_code ?? 1;
+
+            $room->update($data);
         });
 
-        return redirect()->route('rooms.index')->with('success', 'Data kamar diperbarui. Struktur bed telah disesuaikan otomatis.');
+        return redirect()->route('rooms.index')->with('success', 'Data kamar berhasil diperbarui!');
     }
 
     public function destroy(Room $room)
     {
-        // CEK: Apakah kamar ini masih ada penghuninya?
         if ($room->residents()->count() > 0) {
-            // Jika ada, batalkan proses dan kembalikan pesan error
             return redirect()->route('rooms.index')
-                ->with('error', 'Gagal menghapus! Kamar ini masih ditempati oleh penghuni. Silakan pindahkan atau hapus penghuni terlebih dahulu.');
+                ->with('error', 'Gagal menghapus! Kamar ini masih ditempati oleh taruna. Silakan pindahkan taruna terlebih dahulu.');
         }
 
-        // Jika kosong, baru boleh dihapus
         $room->delete();
 
-        return redirect()->route('rooms.index')->with('success', 'Kamar berhasil dihapus.');
+        return redirect()->route('rooms.index')->with('success', 'Data kamar berhasil dihapus!');
     }
 }
