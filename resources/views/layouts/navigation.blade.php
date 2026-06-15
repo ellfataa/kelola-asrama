@@ -24,7 +24,6 @@
             <x-slot name="trigger">
                 <button class="flex items-center gap-3 p-1.5 pr-2 sm:pr-4 rounded-full border border-transparent hover:border-slate-200 hover:bg-slate-50 hover:shadow-sm focus:outline-none transition-all duration-200 group">
 
-                    {{-- Avatar Initial --}}
                     <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-md flex items-center justify-center font-bold text-lg group-hover:scale-105 transition-transform">
                         {{ substr(Auth::user()->name, 0, 1) }}
                     </div>
@@ -46,7 +45,6 @@
             </x-slot>
 
             <x-slot name="content">
-                {{-- Info User untuk tampilan HP --}}
                 <div class="px-4 py-3 border-b border-slate-100 sm:hidden">
                     <p class="text-sm font-bold text-slate-900 truncate">{{ Auth::user()->name }}</p>
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Administrator</p>

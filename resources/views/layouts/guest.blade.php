@@ -22,7 +22,7 @@
     </head>
     <body class="text-slate-900 antialiased bg-white min-h-screen flex overflow-x-hidden">
 
-        {{-- KOLOM KIRI: Branding (Hanya Desktop) --}}
+        {{-- KOLOM KIRI --}}
         <div class="hidden lg:flex lg:w-5/12 bg-slate-50/80 relative flex-col items-center justify-center p-8 text-center border-r border-slate-100">
 
             {{-- Background Ornamen --}}
@@ -47,17 +47,16 @@
 
         </div>
 
-        {{-- KOLOM KANAN: Form Area --}}
+        {{-- KOLOM KANAN --}}
         <div class="w-full lg:w-7/12 flex items-center justify-center p-6 relative bg-white">
 
-            {{-- Logo Mobile (Hanya muncul di HP) --}}
+            {{-- Logo Mobile --}}
             <div class="absolute top-5 left-5 lg:hidden flex items-center gap-3 z-20">
                 <div class="w-10 h-10 bg-white border border-slate-100 rounded-xl p-1.5 shadow-sm">
                     <img src="{{ asset('assets/images/logo-amn.webp') }}" alt="Logo AMN" class="w-full h-full object-contain">
                 </div>
             </div>
 
-            {{-- Container Form (Margin dikurangi) --}}
             <div class="w-full max-w-md mt-10 lg:mt-0 relative z-10">
                 {{ $slot }}
             </div>

@@ -15,7 +15,6 @@
     </div>
 
     {{-- Menu Navigasi --}}
-    {{-- overflow-y-auto HANYA pada bagian menu agar jika menu sangat banyak, yang di-scroll hanya menu-nya saja --}}
     <div class="py-6 px-4 space-y-1.5 overflow-y-auto flex-1 custom-scrollbar">
 
         <div class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 mt-2">
@@ -64,7 +63,6 @@
 
     </div>
 
-    {{-- Footer Sidebar (Logout & Version) --}}
     <div class="p-4 border-t border-slate-800/60 bg-slate-900 shrink-0">
         <form method="POST" action="{{ route('logout') }}">
             @csrf
