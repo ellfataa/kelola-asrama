@@ -8,8 +8,8 @@
                 <img src="{{ asset('assets/images/logo-amn.webp') }}" alt="Logo AMN" class="w-6 h-6 object-contain">
             </div>
             <div class="flex flex-col">
-                <span class="font-bold text-lg tracking-tight text-white leading-none mb-1">Asrama AMN</span>
-                <span class="text-[10px] uppercase font-bold text-indigo-400 tracking-[0.15em]">Cilacap</span>
+                <span class="font-bold text-lg tracking-tight text-white leading-none mb-1">Nautica</span>
+                <span class="text-[10px] uppercase font-bold text-indigo-400 tracking-[0.15em]">Asrama AMN Cilacap</span>
             </div>
         </a>
     </div>

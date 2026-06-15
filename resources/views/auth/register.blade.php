@@ -29,7 +29,6 @@
                 Kelola Asrama Kampus
             </p>
 
-            {{-- Project Title: Nautica --}}
             <h2 class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-500 tracking-[0.2em] uppercase mb-8">
                 Nautica
             </h2>
